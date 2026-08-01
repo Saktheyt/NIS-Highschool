@@ -13,6 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .hero::before, .hero::after { position: absolute; border-radius: 50%; content: ""; pointer-events: none; background: rgba(255,255,255,.06); }
     .hero::before { width: 230px; height: 230px; top: -130px; left: 8%; }
     .hero::after { width: 300px; height: 300px; right: -150px; bottom: -190px; }
+    .hero::before { animation: banner-float-one 8s ease-in-out infinite; }
+    .hero::after { animation: banner-float-two 10s ease-in-out infinite; }
+    @keyframes banner-float-one { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(18px, 20px, 0); } }
+    @keyframes banner-float-two { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(-22px, -18px, 0); } }
     .hero h1, .hero p { position: relative; z-index: 1; }
     .description > h1 { color: #173353; }
     .description > p { line-height: 1.65; }
@@ -36,7 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
     .ios-liquid-glass .school-highlight__item { background: rgba(255,255,255,.42); border: 1px solid rgba(255,255,255,.62); }
     .ios-liquid-glass .btn-abt, .ios-liquid-glass .btn-cnt, .ios-liquid-glass .back-to-top { border: 1px solid rgba(255,255,255,.38); background: rgba(30,82,130,.72); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 8px 20px rgba(24,61,96,.2), inset 0 1px 0 rgba(255,255,255,.25); }
     .ios-liquid-glass .footer { background: rgba(21,53,85,.82); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); border-top: 1px solid rgba(255,255,255,.16); }
+    .ios-page-slider { position: fixed; z-index: 110; right: 14px; bottom: 14px; left: 14px; padding: 7px; overflow: hidden; border: 1px solid rgba(255,255,255,.62); border-radius: 20px; background: rgba(235,246,255,.57); box-shadow: 0 12px 32px rgba(22,58,91,.2), inset 0 1px 0 rgba(255,255,255,.72); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
+    .ios-page-slider__track { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    .ios-page-slider__track::-webkit-scrollbar { display: none; }
+    .ios-page-slider a { flex: 1 0 84px; padding: 10px 9px; border-radius: 14px; color: #234b70; font-size: .75rem; font-weight: 700; text-align: center; text-decoration: none; scroll-snap-align: center; transition: background .2s ease, color .2s ease, transform .2s ease; }
+    .ios-page-slider a.active { color: #fff; background: rgba(28,87,137,.85); box-shadow: 0 4px 11px rgba(24,67,103,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+    .ios-liquid-glass .back-to-top { bottom: 86px; }
     @media (max-width: 768px) { .ios-liquid-glass .hero { margin: 12px 14px 0; border-radius: 20px; } }
+    .menu ul li a.active { background: #2563a8; color: #fff; box-shadow: 0 4px 10px rgba(15, 45, 75, .22); }
+    @media (max-width: 767px) { header .menu { position: absolute; top: calc(100% + 8px); left: 12px; right: 12px; width: auto; margin: 0; padding: 8px; border-radius: 14px; background: #1e3a5f; box-shadow: 0 14px 30px rgba(15, 35, 58, .24); } header .menu ul { gap: 4px; } header .menu ul li { width: 100%; padding: 0; border: 0; } header .menu ul li a { display: block; width: 100%; padding: 12px 16px; border-radius: 9px; text-align: left; } header .menu ul li a:hover, header .menu ul li a:focus-visible { background: rgba(255,255,255,.12); color: #fff; } }
     .menu-icon:focus-visible, .back-to-top:focus-visible { outline: 3px solid #f7c948; outline-offset: 3px; }
     .js-reveal { opacity: 0; transform: translate3d(0, calc(18px + var(--scroll-sway, 0px)), 0); transition: opacity .55s ease, transform .55s ease; }
     .js-reveal.is-visible { opacity: 1; transform: translate3d(0, var(--scroll-sway, 0px), 0); }
@@ -128,12 +140,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Mark the current page in the navigation and make the mobile menu accessible.
-  const currentPage = window.location.pathname.split("/").pop().toLowerCase() || "home.html";
+  const pageName = window.location.pathname.split("/").pop().toLowerCase();
+  const currentPage = !pageName || pageName === "index.html" ? "home.html" : pageName;
   document.querySelectorAll(".menu a").forEach((link) => {
     const linkPage = link.getAttribute("href").split("/").pop().toLowerCase();
-    if (linkPage === currentPage) {
-      link.classList.add("active");
+    const isCurrentPage = linkPage === currentPage;
+    link.classList.toggle("active", isCurrentPage);
+    if (isCurrentPage) {
       link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
     }
   });
 
@@ -168,6 +184,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if (isIOS) {
+    const pages = [
+      { label: "Home", href: "Home.html" },
+      { label: "About", href: "about.html" },
+      { label: "Events", href: "event.html" },
+      { label: "Programs", href: "program.html" }
+    ];
+    const slider = document.createElement("nav");
+    slider.className = "ios-page-slider";
+    slider.setAttribute("aria-label", "Swipe between school pages");
+    slider.innerHTML = `<div class="ios-page-slider__track">${pages.map((page) => {
+      const active = page.href.toLowerCase() === currentPage ? " active" : "";
+      const current = active ? ' aria-current="page"' : "";
+      return `<a class="${active.trim()}" href="${page.href}"${current}>${page.label}</a>`;
+    }).join("")}</div>`;
+    document.body.append(slider);
+
+    const activeIndex = pages.findIndex((page) => page.href.toLowerCase() === currentPage);
+    const track = slider.querySelector(".ios-page-slider__track");
+    let touchStartX = 0;
+    track.addEventListener("touchstart", (event) => { touchStartX = event.touches[0].clientX; }, { passive: true });
+    track.addEventListener("touchend", (event) => {
+      const distance = event.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(distance) < 60 || activeIndex < 0) return;
+      const destination = activeIndex + (distance < 0 ? 1 : -1);
+      if (pages[destination]) window.location.href = pages[destination].href;
+    }, { passive: true });
+  }
+
+  // Use HTML entities so the mobile control renders correctly regardless of file encoding.
+  if (menuButton && menu) {
+    menuButton.innerHTML = "&#9776;";
+    menuButton.addEventListener("click", () => {
+      requestAnimationFrame(() => {
+        menuButton.innerHTML = menu.classList.contains("open") ? "&times;" : "&#9776;";
+      });
+    });
+    menuButton.addEventListener("keydown", () => {
+      requestAnimationFrame(() => {
+        menuButton.innerHTML = menu.classList.contains("open") ? "&times;" : "&#9776;";
+      });
+    });
+  }
+
   // Give longer pages a clear visual rhythm without adding distracting effects.
   const revealItems = document.querySelectorAll(
     ".description, .main-img, .hero, .section, .state, section, .event-card, .program-card, .value-card, .v-card-row"
@@ -175,29 +235,17 @@ document.addEventListener("DOMContentLoaded", () => {
   revealItems.forEach((item) => item.classList.add("js-reveal"));
   document.querySelectorAll(".main-img, .hero").forEach((item) => item.classList.add("sway-banner"));
 
-  const revealItem = (item) => item.classList.add("is-visible");
-  if ("IntersectionObserver" in window) {
-    const revealObserver = new IntersectionObserver(
-      (entries, observer) => entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          revealItem(entry.target);
-          observer.unobserve(entry.target);
-        }
-      }),
-      { threshold: 0, rootMargin: "0px 0px -6% 0px" }
-    );
-    revealItems.forEach((item) => revealObserver.observe(item));
-  } else {
-    revealItems.forEach(revealItem);
-  }
-
-  // The first viewport is already on screen before an observer can fire in some browsers.
-  requestAnimationFrame(() => {
+  const updateReveals = () => {
     revealItems.forEach((item) => {
       const bounds = item.getBoundingClientRect();
-      if (bounds.top < window.innerHeight && bounds.bottom > 0) revealItem(item);
+      if (bounds.top < window.innerHeight * 0.94 && bounds.bottom > 0) {
+        item.classList.add("is-visible");
+      }
     });
-  });
+  };
+  // This continuous visibility check stays reliable when images or fonts change layout.
+  requestAnimationFrame(updateReveals);
+  window.addEventListener("resize", updateReveals, { passive: true });
 
   // Count school figures up once they become visible.
   const statNumbers = document.querySelectorAll(".state-card .card h2");
@@ -251,6 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".sway-banner").forEach((banner) => {
       banner.style.setProperty("--scroll-sway", `${sway}px`);
     });
+    updateReveals();
   };
   window.addEventListener("scroll", updateHeader, { passive: true });
   updateHeader();
