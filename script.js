@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     @media (max-width: 767px) { header .menu { display: block; max-height: 0; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; transform: translateY(-12px); transition: max-height .32s ease, opacity .2s ease, transform .32s ease, visibility 0s linear .32s; } header .menu.open { display: block; max-height: 320px; visibility: visible; opacity: 1; pointer-events: auto; transform: translateY(0); transition: max-height .32s ease, opacity .2s ease, transform .32s ease; } .ios-liquid-glass header .menu.open { max-height: 130px; } }
     @media (max-width: 767px) { .ios-liquid-glass header .menu { padding: 10px; } .ios-liquid-glass header .menu ul { gap: 10px; } .ios-liquid-glass header .menu ul li { flex-basis: 92px; } .ios-liquid-glass header .menu ul li a { display: flex; min-height: 86px; padding: 9px 6px; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 22px; color: #e9f5ff; font-size: .7rem; font-weight: 600; letter-spacing: 0; } .ios-liquid-glass header .menu ul li a::before { display: block; color: currentColor; font-family: Arial, sans-serif; font-size: 29px; font-weight: 400; line-height: 1; } .ios-liquid-glass header .menu ul li a[href="Home.html"]::before { content: "\\2302"; } .ios-liquid-glass header .menu ul li a[href="about.html"]::before { content: "\\2139"; } .ios-liquid-glass header .menu ul li a[href="event.html"]::before { content: "\\2605"; } .ios-liquid-glass header .menu ul li a[href="program.html"]::before { content: "\\25C8"; } .ios-liquid-glass header .menu ul li a.active { color: #174d7c; border-color: rgba(255,255,255,.75); background: rgba(246,252,255,.82); transform: translateY(-2px); box-shadow: 0 7px 18px rgba(4,30,54,.28), inset 0 1px 0 #fff; } }
     @media (max-width: 767px) { .ios-liquid-glass header .menu { position: absolute; isolation: isolate; background: linear-gradient(135deg, rgba(255,255,255,.32), rgba(89,152,203,.34) 48%, rgba(255,255,255,.16)); box-shadow: 0 18px 40px rgba(5,35,63,.3), inset 0 1.5px 1px rgba(255,255,255,.86), inset 0 -1px 1px rgba(12,54,90,.22); } .ios-liquid-glass header .menu::before { position: absolute; z-index: -1; top: 1px; right: 1px; left: 1px; height: 48%; border-radius: 17px 17px 50% 50%; content: ""; background: linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.05)); filter: blur(1px); pointer-events: none; } .ios-liquid-glass header .menu ul { position: relative; z-index: 1; } .ios-liquid-glass header .menu ul li a { position: relative; overflow: hidden; border-color: rgba(255,255,255,.4); background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.05)); box-shadow: inset 0 1px 1px rgba(255,255,255,.34), inset 0 -1px 1px rgba(8,47,80,.15); -webkit-backdrop-filter: blur(12px) saturate(135%); backdrop-filter: blur(12px) saturate(135%); } .ios-liquid-glass header .menu ul li a::after { position: absolute; top: 1px; right: 7px; left: 7px; height: 34%; border-radius: 50%; content: ""; background: linear-gradient(180deg, rgba(255,255,255,.43), rgba(255,255,255,0)); pointer-events: none; } .ios-liquid-glass header .menu ul li a.active { background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(184,225,251,.62)); box-shadow: 0 8px 20px rgba(4,30,54,.27), inset 0 1.5px 1px #fff, inset 0 -1px 1px rgba(35,109,163,.16); } }
+    @media (max-width: 767px) { .ios-liquid-glass header .menu ul li a { color: #e7f7ff; text-shadow: 0 1px 2px rgba(7,39,69,.7); } .ios-liquid-glass header .menu ul li a::before { color: #8ee3ff; filter: drop-shadow(0 1px 2px rgba(7,39,69,.55)); } .ios-liquid-glass header .menu ul li a.active, .ios-liquid-glass header .menu ul li a[aria-current="page"] { color: #0e4d7b; text-shadow: none; outline: 2px solid rgba(255,255,255,.72); outline-offset: -2px; } .ios-liquid-glass header .menu ul li a.active::before, .ios-liquid-glass header .menu ul li a[aria-current="page"]::before { color: #176da5; filter: none; } }
     .menu-icon:focus-visible, .back-to-top:focus-visible { outline: 3px solid #f7c948; outline-offset: 3px; }
     .js-reveal { opacity: 0; transform: translate3d(0, calc(18px + var(--scroll-sway, 0px)), 0); transition: opacity .55s ease, transform .55s ease; }
     .js-reveal.is-visible { opacity: 1; transform: translate3d(0, var(--scroll-sway, 0px), 0); }
@@ -160,9 +161,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const setMenu = (isOpen) => {
       menu.classList.toggle("open", isOpen);
+      if (isOpen) {
+        menu.style.display = "block";
+        menu.style.maxHeight = isIOS ? "130px" : "320px";
+        menu.style.visibility = "visible";
+        menu.style.opacity = "1";
+        menu.style.pointerEvents = "auto";
+      } else {
+        menu.style.removeProperty("display");
+        menu.style.removeProperty("max-height");
+        menu.style.removeProperty("visibility");
+        menu.style.removeProperty("opacity");
+        menu.style.removeProperty("pointer-events");
+      }
       menuButton.textContent = isOpen ? "×" : "☰";
       menuButton.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
       menuButton.setAttribute("aria-expanded", String(isOpen));
+      if (isOpen && isIOS) {
+        menu.querySelector('a[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "center" });
+      }
     };
 
     const toggleMenu = () => setMenu(!menu.classList.contains("open"));
