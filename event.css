@@ -1,0 +1,100 @@
+/* ================= CSS ================= */
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+}
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  background: #1e3a5f;
+  color: white;
+}
+.hero p{
+    color:rgb(148, 163, 184);
+}
+
+.events {
+  padding: 56px 32px;
+  margin: 0 auto;
+}
+.events h2{
+  text-align: center;
+  margin: 20px;
+
+}
+.event-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center; /* center the row */
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.event-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  width: 320px;
+  transition: 0.3s; 
+}
+
+.event-card h3{
+  padding-bottom: 5px;
+  text-align: center;
+}
+
+.event-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.date {
+  color: #1e3a5f;
+  font-weight: 600;
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px 15px;
+  border: none;
+  background: #1e3a5f;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .menu {
+    display: none;
+    position: absolute;
+    background: #1e3a5f;
+    width: 100%;
+    top: 60px;
+    left: 0;
+  }
+
+  .menu.open {
+    display: block;
+  }
+
+  .menu ul {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .menu-icon {
+    display: block;
+  }
+  .event-card{
+    width: 100%;
+    max-width: 350px;
+  }
+}
