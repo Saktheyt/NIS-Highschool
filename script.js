@@ -40,15 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .ios-liquid-glass .school-highlight__item { background: rgba(255,255,255,.42); border: 1px solid rgba(255,255,255,.62); }
     .ios-liquid-glass .btn-abt, .ios-liquid-glass .btn-cnt, .ios-liquid-glass .back-to-top { border: 1px solid rgba(255,255,255,.38); background: rgba(30,82,130,.72); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 8px 20px rgba(24,61,96,.2), inset 0 1px 0 rgba(255,255,255,.25); }
     .ios-liquid-glass .footer { background: rgba(21,53,85,.82); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); border-top: 1px solid rgba(255,255,255,.16); }
-    .ios-page-slider { position: fixed; z-index: 110; right: 14px; bottom: 14px; left: 14px; padding: 7px; overflow: hidden; border: 1px solid rgba(255,255,255,.62); border-radius: 20px; background: rgba(235,246,255,.57); box-shadow: 0 12px 32px rgba(22,58,91,.2), inset 0 1px 0 rgba(255,255,255,.72); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
-    .ios-page-slider__track { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-    .ios-page-slider__track::-webkit-scrollbar { display: none; }
-    .ios-page-slider a { flex: 1 0 84px; padding: 10px 9px; border-radius: 14px; color: #234b70; font-size: .75rem; font-weight: 700; text-align: center; text-decoration: none; scroll-snap-align: center; transition: background .2s ease, color .2s ease, transform .2s ease; }
-    .ios-page-slider a.active { color: #fff; background: rgba(28,87,137,.85); box-shadow: 0 4px 11px rgba(24,67,103,.22), inset 0 1px 0 rgba(255,255,255,.25); }
-    .ios-liquid-glass .back-to-top { bottom: 86px; }
     @media (max-width: 768px) { .ios-liquid-glass .hero { margin: 12px 14px 0; border-radius: 20px; } }
     .menu ul li a.active { background: #2563a8; color: #fff; box-shadow: 0 4px 10px rgba(15, 45, 75, .22); }
     @media (max-width: 767px) { header .menu { position: absolute; top: calc(100% + 8px); left: 12px; right: 12px; width: auto; margin: 0; padding: 8px; border-radius: 14px; background: #1e3a5f; box-shadow: 0 14px 30px rgba(15, 35, 58, .24); } header .menu ul { gap: 4px; } header .menu ul li { width: 100%; padding: 0; border: 0; } header .menu ul li a { display: block; width: 100%; padding: 12px 16px; border-radius: 9px; text-align: left; } header .menu ul li a:hover, header .menu ul li a:focus-visible { background: rgba(255,255,255,.12); color: #fff; } }
+    @media (max-width: 767px) { .ios-liquid-glass header .menu { padding: 8px; border: 1px solid rgba(255,255,255,.42); border-radius: 18px; background: rgba(26,66,103,.62); -webkit-backdrop-filter: blur(22px) saturate(155%); backdrop-filter: blur(22px) saturate(155%); } .ios-liquid-glass header .menu ul { flex-direction: row; gap: 8px; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; touch-action: pan-x; } .ios-liquid-glass header .menu ul::-webkit-scrollbar { display: none; } .ios-liquid-glass header .menu ul li { flex: 0 0 118px; } .ios-liquid-glass header .menu ul li a { padding: 12px 14px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: rgba(255,255,255,.08); text-align: center; scroll-snap-align: center; } .ios-liquid-glass header .menu ul li a.active { background: rgba(88,161,218,.78); box-shadow: 0 5px 13px rgba(6,31,56,.25), inset 0 1px 0 rgba(255,255,255,.28); } }
     .menu-icon:focus-visible, .back-to-top:focus-visible { outline: 3px solid #f7c948; outline-offset: 3px; }
     .js-reveal { opacity: 0; transform: translate3d(0, calc(18px + var(--scroll-sway, 0px)), 0); transition: opacity .55s ease, transform .55s ease; }
     .js-reveal.is-visible { opacity: 1; transform: translate3d(0, var(--scroll-sway, 0px), 0); }
@@ -182,35 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", () => {
       if (window.innerWidth > 767) setMenu(false);
     });
-  }
-
-  if (isIOS) {
-    const pages = [
-      { label: "Home", href: "Home.html" },
-      { label: "About", href: "about.html" },
-      { label: "Events", href: "event.html" },
-      { label: "Programs", href: "program.html" }
-    ];
-    const slider = document.createElement("nav");
-    slider.className = "ios-page-slider";
-    slider.setAttribute("aria-label", "Swipe between school pages");
-    slider.innerHTML = `<div class="ios-page-slider__track">${pages.map((page) => {
-      const active = page.href.toLowerCase() === currentPage ? " active" : "";
-      const current = active ? ' aria-current="page"' : "";
-      return `<a class="${active.trim()}" href="${page.href}"${current}>${page.label}</a>`;
-    }).join("")}</div>`;
-    document.body.append(slider);
-
-    const activeIndex = pages.findIndex((page) => page.href.toLowerCase() === currentPage);
-    const track = slider.querySelector(".ios-page-slider__track");
-    let touchStartX = 0;
-    track.addEventListener("touchstart", (event) => { touchStartX = event.touches[0].clientX; }, { passive: true });
-    track.addEventListener("touchend", (event) => {
-      const distance = event.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(distance) < 60 || activeIndex < 0) return;
-      const destination = activeIndex + (distance < 0 ? 1 : -1);
-      if (pages[destination]) window.location.href = pages[destination].href;
-    }, { passive: true });
   }
 
   // Use HTML entities so the mobile control renders correctly regardless of file encoding.
