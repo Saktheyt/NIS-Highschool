@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const interactionStyles = document.createElement("style");
   interactionStyles.textContent = `
     header { position: sticky; top: 0; z-index: 100; transition: box-shadow .25s ease, background-color .25s ease; }
+    .menu-icon { border: 0; background: transparent; font-family: inherit; }
     header.is-scrolled { box-shadow: 0 8px 24px rgba(15, 35, 58, .24); }
     body { background: #f8fafc; color: #26384c; }
     main { min-height: 530px; }
@@ -38,6 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .ios-liquid-glass .school-highlight h2, .ios-liquid-glass .school-highlight__item strong { color: #153b61; }
     .ios-liquid-glass .school-highlight > p:last-child, .ios-liquid-glass .school-highlight__item > span { color: #315775; }
     .ios-liquid-glass .school-highlight__item { background: rgba(255,255,255,.42); border: 1px solid rgba(255,255,255,.62); }
+    .ios-liquid-glass .event-card, .ios-liquid-glass .program-card, .ios-liquid-glass .value-card, .ios-liquid-glass .v-card-row, .ios-liquid-glass .card, .ios-liquid-glass .school-highlight { position: relative; overflow: hidden; background: linear-gradient(145deg, rgba(255,255,255,.76), rgba(220,241,255,.42)); border-color: rgba(255,255,255,.82); box-shadow: 0 15px 34px rgba(27,74,111,.14), inset 0 1.5px 1px rgba(255,255,255,.9), inset 0 -1px 1px rgba(33,92,132,.1); }
+    .ios-liquid-glass .event-card::before, .ios-liquid-glass .program-card::before, .ios-liquid-glass .value-card::before, .ios-liquid-glass .v-card-row::before, .ios-liquid-glass .card::before, .ios-liquid-glass .school-highlight::before { position: absolute; z-index: 0; top: 0; right: 8%; left: 8%; height: 38%; border-radius: 0 0 55% 55%; content: ""; background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0)); pointer-events: none; }
+    .ios-liquid-glass .event-card > *, .ios-liquid-glass .program-card > *, .ios-liquid-glass .value-card > *, .ios-liquid-glass .v-card-row > *, .ios-liquid-glass .card > *, .ios-liquid-glass .school-highlight > * { position: relative; z-index: 1; }
+    .ios-liquid-glass .event-card img, .ios-liquid-glass .program-card img { border: 1px solid rgba(255,255,255,.74); box-shadow: 0 6px 16px rgba(25,72,106,.16); opacity: .94; }
+    .ios-liquid-glass .school-highlight__item { background: linear-gradient(145deg, rgba(255,255,255,.62), rgba(206,235,252,.34)); box-shadow: inset 0 1px 1px rgba(255,255,255,.8); }
     .ios-liquid-glass .btn-abt, .ios-liquid-glass .btn-cnt, .ios-liquid-glass .back-to-top { border: 1px solid rgba(255,255,255,.38); background: rgba(30,82,130,.72); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 8px 20px rgba(24,61,96,.2), inset 0 1px 0 rgba(255,255,255,.25); }
     .ios-liquid-glass .footer { background: rgba(21,53,85,.82); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); border-top: 1px solid rgba(255,255,255,.16); }
     @media (max-width: 768px) { .ios-liquid-glass .hero { margin: 12px 14px 0; border-radius: 20px; } }
@@ -75,9 +81,20 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.head.append(interactionStyles);
   const header = document.querySelector("header");
-  const menuButton = document.querySelector(".menu-icon");
+  let menuButton = document.querySelector(".menu-icon");
   const menu = document.querySelector(".menu");
   const homeDescription = document.querySelector("main .description");
+
+  // Upgrade the legacy menu div into a real button for dependable touch interaction.
+  if (menuButton && menuButton.tagName !== "BUTTON") {
+    const button = document.createElement("button");
+    button.className = menuButton.className;
+    button.type = "button";
+    button.setAttribute("aria-label", "Open navigation menu");
+    button.innerHTML = "&#9776;";
+    menuButton.replaceWith(button);
+    menuButton = button;
+  }
 
   // Replace a missing home-banner image with useful school information.
   const homeImageArea = document.querySelector("main .main-img");
