@@ -3,13 +3,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   if (isIOS) document.documentElement.classList.add("ios-liquid-glass");
+  const savedTheme = localStorage.getItem("nis-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+    document.documentElement.classList.add("dark-mode");
+  }
   const interactionStyles = document.createElement("style");
   interactionStyles.textContent = `
     header { position: sticky; top: 0; z-index: 100; transition: box-shadow .25s ease, background-color .25s ease; }
     .menu-icon { border: 0; background: transparent; font-family: inherit; }
+    ::selection { color: #173353; background: #f8db7d; }
+    .scroll-progress { position: fixed; top: 0; left: 0; z-index: 130; width: 100%; height: 3px; pointer-events: none; background: transparent; }
+    .scroll-progress__bar { width: 0; height: 100%; border-radius: 0 99px 99px 0; background: linear-gradient(90deg, #f7c948, #78c7ef); box-shadow: 0 1px 7px rgba(247,201,72,.5); transition: width .08s linear; }
     header.is-scrolled { box-shadow: 0 8px 24px rgba(15, 35, 58, .24); }
     body { background: #f8fafc; color: #26384c; }
+    html:not(.ios-liquid-glass) body { background-image: radial-gradient(circle at 7% 22%, rgba(70,137,190,.1) 0, transparent 19rem), radial-gradient(circle at 94% 66%, rgba(247,201,72,.1) 0, transparent 17rem); }
     main { min-height: 530px; }
+    .description { position: relative; }
+    .description::before { display: inline-block; margin-bottom: 12px; padding: 6px 11px; border-radius: 999px; content: "WELCOME TO NIS"; color: #1e5e96; background: #e5f2fc; font-size: .72rem; font-weight: 700; letter-spacing: .1em; }
     .hero { position: relative; overflow: hidden; background: linear-gradient(135deg, #173353 0%, #1e3a5f 55%, #2d6698 100%); }
     .hero::before, .hero::after { position: absolute; border-radius: 50%; content: ""; pointer-events: none; background: rgba(255,255,255,.06); }
     .hero::before { width: 230px; height: 230px; top: -130px; left: 8%; }
@@ -20,7 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
     @keyframes banner-float-two { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(-22px, -18px, 0); } }
     .hero h1, .hero p { position: relative; z-index: 1; }
     .description > h1 { color: #173353; }
-    .description > p { line-height: 1.65; }
+    .description > h1, .hero h1 { text-wrap: balance; }
+    .hero h1 { text-shadow: 0 3px 14px rgba(4, 29, 52, .2); letter-spacing: .01em; }
+    .description > p { line-height: 1.65; border-left: 3px solid #f7c948; padding-left: 14px; }
+    .text p:first-child::first-letter { float: left; margin: .08em .13em 0 0; color: #2563a8; font-size: 3.2em; font-weight: 700; line-height: .8; }
     .btn-abt, .btn-cnt { cursor: pointer; box-shadow: 0 7px 16px rgba(30, 58, 95, .18); transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
     .btn-abt:hover, .btn-cnt:hover { transform: translateY(-3px); box-shadow: 0 11px 20px rgba(30, 58, 95, .25); }
     .btn-cnt { background-color: #2563a8; }
@@ -29,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .event-card img, .program-card img { display: block; height: 190px; object-fit: cover; transition: transform .35s ease; }
     .event-card:hover img, .program-card:hover img { transform: scale(1.04); }
     .events > h2, .programs > h2, section > h2, .state > h2 { color: #173353; letter-spacing: -.02em; }
+    .events > h2::after, .programs > h2::after, section > h2::after, .state > h2::after { display: block; width: 46px; height: 4px; margin: 10px auto 0; border-radius: 99px; content: ""; background: linear-gradient(90deg, #f7c948, #4f9bd2); }
+    html:not(.ios-liquid-glass) .event-card::before, html:not(.ios-liquid-glass) .program-card::before, html:not(.ios-liquid-glass) .value-card::before { display: block; width: 42px; height: 4px; margin-bottom: 13px; border-radius: 99px; content: ""; background: linear-gradient(90deg, #f7c948, #4f9bd2); }
     .footer { margin-top: 24px; }
     /* Applied only when JavaScript detects iPhone or iPad. */
     .ios-liquid-glass, .ios-liquid-glass body { background: radial-gradient(circle at 10% 4%, #e0f1ff 0, transparent 28%), radial-gradient(circle at 92% 18%, #e9e4ff 0, transparent 25%), #eef5fb; }
@@ -48,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .ios-liquid-glass .footer { background: rgba(21,53,85,.82); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); border-top: 1px solid rgba(255,255,255,.16); }
     @media (max-width: 768px) { .ios-liquid-glass .hero { margin: 12px 14px 0; border-radius: 20px; } }
     .menu ul li a.active { background: #2563a8; color: #fff; box-shadow: 0 4px 10px rgba(15, 45, 75, .22); }
+    .menu ul li a:hover:not(.active), .menu ul li a:focus-visible:not(.active) { color: #ffffff; background: #3b82c4; box-shadow: 0 4px 10px rgba(15, 45, 75, .16); }
     @media (max-width: 767px) { header .menu { position: absolute; top: calc(100% + 8px); left: 12px; right: 12px; width: auto; margin: 0; padding: 8px; border-radius: 14px; background: #1e3a5f; box-shadow: 0 14px 30px rgba(15, 35, 58, .24); } header .menu ul { gap: 4px; padding: 0; } header .menu ul li { width: 100%; margin: 0; padding: 0; border: 0; } header .menu ul li a { display: block; width: 100%; padding: 12px 16px; border-radius: 9px; text-align: left; } header .menu ul li a:hover, header .menu ul li a:focus-visible { background: rgba(255,255,255,.12); color: #fff; } }
     @media (max-width: 767px) { .ios-liquid-glass header .menu { padding: 8px; border: 1px solid rgba(255,255,255,.42); border-radius: 18px; background: rgba(26,66,103,.62); -webkit-backdrop-filter: blur(22px) saturate(155%); backdrop-filter: blur(22px) saturate(155%); } .ios-liquid-glass header .menu ul { flex-direction: row; gap: 8px; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; touch-action: pan-x; } .ios-liquid-glass header .menu ul::-webkit-scrollbar { display: none; } .ios-liquid-glass header .menu ul li { flex: 0 0 118px; } .ios-liquid-glass header .menu ul li a { padding: 12px 14px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: rgba(255,255,255,.08); text-align: center; scroll-snap-align: center; } .ios-liquid-glass header .menu ul li a.active { background: rgba(88,161,218,.78); box-shadow: 0 5px 13px rgba(6,31,56,.25), inset 0 1px 0 rgba(255,255,255,.28); } }
     @media (max-width: 767px) { header .menu { display: block; max-height: 0; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; transform: translateY(-12px); transition: max-height .32s ease, opacity .2s ease, transform .32s ease, visibility 0s linear .32s; } header .menu.open { display: block; max-height: 320px; visibility: visible; opacity: 1; pointer-events: auto; transform: translateY(0); transition: max-height .32s ease, opacity .2s ease, transform .32s ease; } .ios-liquid-glass header .menu.open { max-height: 130px; } }
@@ -57,10 +74,12 @@ document.addEventListener("DOMContentLoaded", () => {
     @media (max-width: 767px) { .ios-liquid-glass header .menu.open { max-height: 104px; } .ios-liquid-glass header .menu ul li { flex-basis: 78px; } .ios-liquid-glass header .menu ul li a { min-height: 62px; padding: 7px 5px; gap: 3px; border-radius: 11px; color: #ffffff; font-size: .68rem; text-shadow: 0 1px 2px rgba(4,29,53,.85); } .ios-liquid-glass header .menu ul li a::before { font-size: 21px; color: #b8edff; } .ios-liquid-glass header .menu ul li a::after { display: none; } .ios-liquid-glass header .menu ul li a.active, .ios-liquid-glass header .menu ul li a[aria-current="page"] { color: #083f6c; background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(193,229,250,.82)); outline: 2px solid rgba(255,255,255,.9); text-shadow: none; } }
     @media (max-width: 767px) { .ios-liquid-glass header .menu ul { width: 100%; } .ios-liquid-glass header .menu ul li { flex: 1 0 78px; } .ios-liquid-glass header .menu ul li a { width: 100%; } .ios-liquid-glass header .menu ul li a[href="Home.html"].active, .ios-liquid-glass header .menu ul li a[href="Home.html"][aria-current="page"] { color: #083f6c; background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(193,229,250,.82)); outline: 2px solid rgba(255,255,255,.9); } }
     .menu-icon:focus-visible, .back-to-top:focus-visible { outline: 3px solid #f7c948; outline-offset: 3px; }
-    .js-reveal { opacity: 0; transform: translate3d(0, calc(18px + var(--scroll-sway, 0px)), 0); transition: opacity .55s ease, transform .55s ease; }
-    .js-reveal.is-visible { opacity: 1; transform: translate3d(0, var(--scroll-sway, 0px), 0); }
+    .js-reveal { opacity: 1; transform: translate3d(0, var(--scroll-sway, 0px), 0); }
+    .js-reveal.is-visible { animation: school-pop-in .55s cubic-bezier(.2, .8, .2, 1) both; }
+    @keyframes school-pop-in { from { opacity: .01; transform: translate3d(0, calc(18px + var(--scroll-sway, 0px)), 0) scale(.985); } to { opacity: 1; transform: translate3d(0, var(--scroll-sway, 0px), 0) scale(1); } }
     .sway-banner { will-change: transform; }
-    .school-highlight { width: min(100%, 510px); margin-left: 50px; padding: 32px; border-radius: 22px; color: #eef6ff; background: linear-gradient(145deg, #1e3a5f, #28588b); box-shadow: 0 18px 40px rgba(30, 58, 95, .22); }
+    .main-img { display: flex; justify-content: center; }
+    .school-highlight { width: min(100%, 510px); margin-left: 0; padding: 32px; border-radius: 22px; color: #eef6ff; background: linear-gradient(145deg, #1e3a5f, #28588b); box-shadow: 0 18px 40px rgba(30, 58, 95, .22); }
     .school-highlight__eyebrow { margin: 0 0 8px; color: #f7c948; font-size: .76rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
     .school-highlight h2 { margin: 0; font-size: 1.8rem; line-height: 1.25; }
     .school-highlight > p:last-child { margin: 10px 0 0; color: #d6e5f5; line-height: 1.65; }
@@ -76,9 +95,25 @@ document.addEventListener("DOMContentLoaded", () => {
     @media (max-width: 768px) { .school-highlight { margin-left: 0; } }
     .event-card, .program-card, .value-card, .card { transition: transform .2s ease, box-shadow .2s ease; }
     .event-card:hover, .program-card:hover, .value-card:hover, .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(30, 58, 95, .14); }
-    .back-to-top { position: fixed; right: 22px; bottom: 22px; z-index: 90; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #1e3a5f; color: #fff; font-size: 24px; line-height: 1; cursor: pointer; box-shadow: 0 6px 18px rgba(15, 35, 58, .3); opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s ease, transform .2s ease, background .2s ease; }
-    .back-to-top:hover { background: #2563eb; }
+    .back-to-top { position: fixed; right: 22px; bottom: 22px; z-index: 90; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #f7c948; color: #173353; font-size: 24px; line-height: 1; cursor: pointer; box-shadow: 0 6px 18px rgba(127, 88, 8, .26); opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s ease, transform .2s ease, background .2s ease, box-shadow .2s ease; }
+    .back-to-top:hover { background: #ffe38a; box-shadow: 0 0 0 5px rgba(247, 201, 72, .22), 0 0 28px rgba(247, 201, 72, .75); }
+    .ios-liquid-glass .back-to-top { background: rgba(247, 201, 72, .8); color: #173353; }
     .back-to-top.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .theme-toggle { position: fixed; bottom: 22px; left: 22px; z-index: 90; width: 44px; height: 44px; border: 1px solid #d7e2ed; border-radius: 50%; color: #173353; background: #ffffff; font-size: 20px; cursor: pointer; box-shadow: 0 6px 18px rgba(15, 35, 58, .16); transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .theme-toggle:hover { transform: translateY(-3px) rotate(10deg); box-shadow: 0 10px 22px rgba(15, 35, 58, .22); }
+    .dark-mode body { color: #dce9f5; background: #0d1926; }
+    .dark-mode header { background: #12263d; }
+    .dark-mode .hero { background: linear-gradient(135deg, #102b47, #183f62 55%, #1b5279); }
+    .dark-mode .description > h1, .dark-mode .events > h2, .dark-mode .programs > h2, .dark-mode section > h2, .dark-mode .state > h2, .dark-mode .section-title, .dark-mode .card h2, .dark-mode .value-card h3, .dark-mode .v-card-row h3 { color: #eaf5ff; }
+    .dark-mode .description > p, .dark-mode .section-sub, .dark-mode .text p { color: #b7c9db; }
+    .dark-mode .event-card, .dark-mode .program-card, .dark-mode .value-card, .dark-mode .v-card-row, .dark-mode .card { color: #dce9f5; background: #142638; border-color: #2b4a64; box-shadow: 0 8px 22px rgba(0,0,0,.2); }
+    .dark-mode .event-card::before, .dark-mode .program-card::before, .dark-mode .value-card::before { opacity: .85; }
+    .dark-mode .footer { background: #10243a; }
+    .dark-mode .theme-toggle { color: #fff4c8; background: #1c3855; border-color: #42647e; }
+    .dark-mode.ios-liquid-glass body { background: radial-gradient(circle at 10% 4%, #1f4564 0, transparent 28%), radial-gradient(circle at 92% 18%, #303b6c 0, transparent 25%), #0d1926; }
+    .dark-mode.ios-liquid-glass .event-card, .dark-mode.ios-liquid-glass .program-card, .dark-mode.ios-liquid-glass .value-card, .dark-mode.ios-liquid-glass .v-card-row, .dark-mode.ios-liquid-glass .card, .dark-mode.ios-liquid-glass .school-highlight { color: #e6f4ff; background: rgba(23, 52, 78, .68); border-color: rgba(158, 211, 245, .22); }
+    .dark-mode.ios-liquid-glass .school-highlight h2, .dark-mode.ios-liquid-glass .school-highlight__item strong { color: #f1f8ff; }
+    .dark-mode.ios-liquid-glass .school-highlight > p:last-child, .dark-mode.ios-liquid-glass .school-highlight__item > span { color: #bfd9ee; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } .js-reveal { opacity: 1; transform: none; } }
   `;
   document.head.append(interactionStyles);
@@ -305,6 +340,27 @@ document.addEventListener("DOMContentLoaded", () => {
   topButton.innerHTML = "↑";
   topButton.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   document.body.append(topButton);
+  const themeToggle = document.createElement("button");
+  themeToggle.className = "theme-toggle";
+  themeToggle.type = "button";
+  const updateThemeToggle = () => {
+    const isDark = document.documentElement.classList.contains("dark-mode");
+    themeToggle.innerHTML = isDark ? "&#9728;" : "&#9790;";
+    themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+  };
+  updateThemeToggle();
+  themeToggle.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark-mode");
+    localStorage.setItem("nis-theme", document.documentElement.classList.contains("dark-mode") ? "dark" : "light");
+    updateThemeToggle();
+  });
+  document.body.append(themeToggle);
+  const progress = document.createElement("div");
+  progress.className = "scroll-progress";
+  progress.setAttribute("aria-hidden", "true");
+  progress.innerHTML = '<div class="scroll-progress__bar"></div>';
+  document.body.append(progress);
+  const progressBar = progress.firstElementChild;
   const updateHeader = () => {
     header?.classList.toggle("is-scrolled", window.scrollY > 12);
     topButton.classList.toggle("is-visible", window.scrollY > 360);
@@ -313,6 +369,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".sway-banner").forEach((banner) => {
       banner.style.setProperty("--scroll-sway", `${sway}px`);
     });
+    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progressValue = scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
+    progressBar.style.width = `${Math.min(100, Math.max(0, progressValue))}%`;
     updateReveals();
   };
   window.addEventListener("scroll", updateHeader, { passive: true });
